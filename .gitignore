@@ -1,0 +1,16 @@
+﻿# Segredos
+.env
+site/config.js
+
+# Dependências e arquivos gerados
+node_modules/
+.tmp/
+.cache/
+.strapi/
+dist/
+build/
+teste-creative/public/uploads/
+
+# Sistema
+.DS_Store
+Thumbs.db

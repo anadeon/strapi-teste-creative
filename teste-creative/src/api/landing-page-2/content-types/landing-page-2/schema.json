@@ -1,0 +1,32 @@
+{
+  "kind": "singleType",
+  "collectionName": "landing_page_2s",
+  "info": {
+    "singularName": "landing-page-2",
+    "pluralName": "landing-page-2s",
+    "displayName": "Landing Page 2"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "titulo_hero": {
+      "type": "string"
+    },
+    "subtitulo_hero": {
+      "type": "string"
+    },
+    "texto_botao": {
+      "type": "string"
+    },
+    "link_botao": {
+      "type": "string"
+    },
+    "titulo": {
+      "type": "component",
+      "component": "shared.teste",
+      "repeatable": true
+    }
+  }
+}
