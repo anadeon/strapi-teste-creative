@@ -14,11 +14,10 @@ Projeto de teste para avaliar o **Strapi** como CMS, pensado em ser o mais próx
 4. [Instalação passo a passo](#4-instalação-passo-a-passo)
 5. [Modelo de conteúdo no Strapi](#5-modelo-de-conteúdo-no-strapi)
 6. [Uso no dia a dia](#6-uso-no-dia-a-dia)
-7. [Backup e compartilhamento do conteúdo](#7-backup-e-compartilhamento-do-conteúdo)
-8. [Trabalhando com Git](#8-trabalhando-com-git)
-9. [Problemas comuns](#9-problemas-comuns)
-10. [Segurança](#10-segurança)
-11. [Referência rápida](#11-referência-rápida)
+7. [Trabalhando com Git](#8-trabalhando-com-git)
+8. [Problemas comuns](#9-problemas-comuns)
+9. [Segurança](#10-segurança)
+10. [Referência rápida](#11-referência-rápida)
 
 ---
 
@@ -32,8 +31,8 @@ Projeto de teste para avaliar o **Strapi** como CMS, pensado em ser o mais próx
 └────────────────────┘      └────────────────────┘      └─────────────────────┘
 ```
 
-- **Postgres** guarda todo o conteúdo (textos, listas). Roda dentro de um container Docker.
-- **Strapi** é o painel onde o conteúdo é editado e a API que o entrega.
+- **Postgres** é o banco de dados, guarda todo o conteúdo (textos, listas). Roda dentro de um container Docker.
+- **Strapi** é o painel onde o conteúdo é editado.
 - **Site** é uma página estática. O arquivo `cms.js` busca o conteúdo na API do Strapi e preenche os textos da página.
 ---
 
@@ -52,7 +51,7 @@ Baixe em <https://git-scm.com/downloads> e instale com as opções padrão.
 
 ### 2.2 Node.js
 
-Baixe a versão **LTS** em <https://nodejs.org>. Para saber qual versão o Strapi aceita, abra o arquivo `teste-creative/package.json` e veja o campo `engines` (por exemplo, `"node": ">=20.0.0 <=24.x.x"`). Use uma versão dentro dessa faixa.
+Baixe a versão em <https://nodejs.org>. Para saber qual versão o Strapi aceita, abra o arquivo `teste-creative/package.json` e veja o campo `engines` (por exemplo, `"node": ">=20.0.0 <=24.x.x"`). Use uma versão dentro dessa faixa.
 
 ### 2.3 Docker Desktop
 
@@ -63,7 +62,7 @@ Baixe a versão **LTS** em <https://nodejs.org>. Para saber qual versão o Strap
    wsl --update
    ```
    e reinicie o computador.
-3. Abra o **Docker Desktop** e espere aparecer **"Engine running"** (em verde) no canto inferior esquerdo. **O Docker Desktop precisa estar aberto sempre que for usar o projeto.**
+3. Abra o **Docker Desktop** e espere aparecer **"Engine running"** (em verde) no canto inferior esquerdo. O Docker Desktop precisa estar aberto sempre que for usar o projeto.
 
 ---
 
@@ -84,7 +83,6 @@ strapi-teste-creative/
     ├── style.css
     ├── script.js             ← comportamento da página (menu etc.)
     ├── cms.js                ← busca e preenche o conteúdo do Strapi
-    └── config.example.js     ← modelo do arquivo com o token (copiar para config.js)
 ```
 
 **Arquivos que NÃO estão no repositório** (cada pessoa cria os seus, por segurança):
@@ -260,7 +258,7 @@ Para preencher manualmente:
 1. No menu lateral, clique em **Content Manager**.
 2. Em "Single types", clique em **Landing Page 2**.
 3. Preencha os campos (veja a [seção 5](#5-modelo-de-conteúdo-no-strapi)).
-4. Na lista de benefícios/serviços, clique em **Add an entry** para cada item.
+4. Na lista de teste, clique em **Add an entry** para cada item.
 5. Clique em **Save** e depois em **Publish**.
 
 > ⚠️ **Sem o Publish, a API não entrega o conteúdo.** Salvar não basta.
@@ -329,7 +327,7 @@ Tipo de conteúdo: **Landing Page 2** (*Single Type*). Endereço da API: `/api/l
 | `link_botao` | Short text | Link do botão principal |
 | `beneficios` | Componente repetível | Cartões da seção de serviços |
 
-Campos dentro de cada item de `beneficios`:
+Campos dentro de cada item de `teste`:
 
 | Campo | Tipo | Onde aparece |
 |---|---|---|
@@ -348,8 +346,6 @@ No `index.html`, os elementos recebem atributos que dizem qual campo do Strapi v
 
 Dentro de uma lista, o número do cartão (`01`, `02`...) é gerado automaticamente pela posição do item.
 
-O texto que está escrito no HTML serve de **reserva**: ele aparece se o Strapi estiver fora do ar, e é substituído quando o conteúdo chega.
-
 ### Para adicionar um campo novo
 
 1. No Strapi: **Content-Type Builder → Landing Page 2 → Add another field**. Salve e espere o Strapi reiniciar.
@@ -357,8 +353,6 @@ O texto que está escrito no HTML serve de **reserva**: ele aparece se o Strapi 
 3. No Strapi: preencha o campo e clique em **Publish**.
 
 Não é necessário mexer no `cms.js`.
-
-> Os arquivos da estrutura (campos e componentes) ficam em `teste-creative/src`. **Commite essas alterações** para que os colegas recebam os novos campos com `git pull`.
 
 ---
 
@@ -388,7 +382,7 @@ npx serve
 | O que fazer | Comando |
 |---|---|
 | Parar o Strapi ou o site | `Ctrl + C` no terminal correspondente |
-| Parar o Postgres (**mantém** os dados) | `docker compose stop` |
+| Parar o Postgres  | `docker compose stop` |
 | Remover o container (**mantém** os dados no volume) | `docker compose down` |
 | Remover o container **e apagar todos os dados** | `docker compose down -v` |
 
@@ -406,54 +400,16 @@ npm run develop
 
 ---
 
-## 7. Backup e compartilhamento do conteúdo
-
-O conteúdo vive no banco de cada pessoa. Para levar os dados de uma máquina para outra, use a exportação e a importação do Strapi. Os comandos rodam dentro da pasta `teste-creative`, com o **Strapi parado**.
-
-**Exportar (quem tem o conteúdo):**
-
-```powershell
-npm run strapi export -- --no-encrypt -f backup-strapi
-```
-
-Gera o arquivo `backup-strapi.tar.gz` (conteúdo e arquivos enviados). Envie por um canal interno da empresa.
-
-**Importar (quem recebe):**
-
-```powershell
-npm run strapi import -- -f backup-strapi.tar.gz
-```
-
-O Strapi pede confirmação antes de importar, porque a importação **substitui** os dados existentes.
-
-Observações:
-
-- **Não commite o arquivo de backup no Git.**
-- Tokens de API **não** devem ser tratados como parte do backup. Cada pessoa gera o seu (passo 4.8).
-- Para detalhes e opções, consulte a documentação do Strapi sobre *Data management* (export/import).
-
----
-
 ## 8. Trabalhando com Git
 
 ### Rotina básica
 
 ```powershell
 git pull                     # baixar as novidades antes de começar
-git add .
-git status                   # CONFIRA a lista antes de commitar
+git add .                    # adicionar as alterações
+git status                   # conferir quais foram arquivos alterados
 git commit -m "descrição do que mudou"
-git push
-```
-
-### Sugestão para o trabalho em equipe
-
-Crie uma branch para cada mudança e abra um Pull Request no GitHub:
-
-```powershell
-git checkout -b nome-da-mudanca
-# ...edite, commite...
-git push -u origin nome-da-mudanca
+git push                     # envia as alterações para o repositório
 ```
 
 ### Nunca commite
@@ -530,7 +486,6 @@ Só devem aparecer arquivos de modelo (`.env.example`, `config.example.js`).
 
 | Mensagem ou sintoma | Causa | Solução |
 |---|---|---|
-| `Repository not found` ao clonar | Convite não aceito, ou logado com outra conta | Aceite o convite e confirme a conta do GitHub |
 | `rejected ... fetch first` no `git push` | Há novidades no repositório remoto | Rode `git pull` e depois `git push` |
 | `.env` ou `config.js` aparece no `git status` | `.gitignore` não está funcionando | **Não commite.** Confira o `.gitignore` na raiz e peça ajuda |
 
@@ -585,13 +540,12 @@ Só devem aparecer arquivos de modelo (`.env.example`, `config.example.js`).
 ### Checklist de primeira instalação
 
 - [ ] Git, Node.js e Docker Desktop instalados
-- [ ] Convite do repositório aceito e repositório clonado (fora do OneDrive)
+- [ ] Repositório clonado (fora do OneDrive)
 - [ ] Docker Desktop aberto ("Engine running") e `docker compose up -d` executado
 - [ ] `teste-creative/.env` criado com chaves próprias e credenciais do banco
 - [ ] `npm install` e `npm run develop` executados em `teste-creative`
 - [ ] Administrador criado em <http://localhost:1337/admin>
-- [ ] Conteúdo da Landing Page 2 preenchido e **publicado** (ou backup importado)
+- [ ] Conteúdo da Landing Page 2 preenchido e **publicado**
 - [ ] API Token **Read-only** gerado
-- [ ] `site/config.js` criado com o token
 - [ ] Site rodando com `npx serve` e mostrando o conteúdo do Strapi
 - [ ] Teste de edição no Strapi refletido no site (Ctrl + F5)
