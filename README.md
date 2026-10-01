@@ -14,10 +14,10 @@ Projeto de teste para avaliar o **Strapi** como CMS, pensado em ser o mais próx
 4. [Instalação passo a passo](#4-instalação-passo-a-passo)
 5. [Modelo de conteúdo no Strapi](#5-modelo-de-conteúdo-no-strapi)
 6. [Uso no dia a dia](#6-uso-no-dia-a-dia)
-7. [Trabalhando com Git](#8-trabalhando-com-git)
-8. [Problemas comuns](#9-problemas-comuns)
-9. [Segurança](#10-segurança)
-10. [Referência rápida](#11-referência-rápida)
+7. [Trabalhando com Git](#7-trabalhando-com-git)
+8. [Problemas comuns](#8-problemas-comuns)
+9. [Segurança](#9-segurança)
+10. [Referência rápida](#10-referência-rápida)
 
 ---
 
@@ -276,9 +276,9 @@ O site precisa de um token para ler a API. Cada pessoa gera o seu.
    - **Token type:** **Read-only**
 5. Clique em **Save**.
 6. **Copie o token** que aparece (um texto longo). Ele costuma ser mostrado por completo só na criação. Se perder, abra o token e use **Regenerate**, que gera um valor novo (o antigo deixa de funcionar).
+7. Cole o token no arquivo `cms.js`, na segunda linha em const STRAPI_TOKEN = "COLE_O_TOKEN_AQUI";
 
-
-### 4.10 Rodar o site
+### 4.9 Rodar o site
 
 Em um **segundo terminal** (o Strapi continua rodando no primeiro), dentro da pasta `site`:
 
@@ -292,7 +292,7 @@ Na primeira vez, o `npx` pergunta se pode instalar o pacote `serve`. Responda `y
 
 Alternativa: no Cursor, instale a extensão **Live Server**, clique com o botão direito no `index.html` e escolha **Open with Live Server** (endereço `http://127.0.0.1:5500`).
 
-### 4.11 Testar se está funcionando
+### 4.10 Testar se está funcionando
 
 **Teste 1: a API responde?** No PowerShell (use `curl.exe`, com o `.exe`):
 
@@ -400,7 +400,7 @@ npm run develop
 
 ---
 
-## 8. Trabalhando com Git
+## 7. Trabalhando com Git
 
 ### Rotina básica
 
@@ -417,7 +417,6 @@ git push                     # envia as alterações para o repositório
 | Arquivo/pasta | Motivo |
 |---|---|
 | `teste-creative/.env` | Senhas e chaves do Strapi |
-| `site/config.js` | Token de acesso à API |
 | `node_modules/` | Dependências (são reinstaladas com `npm install`) |
 | `teste-creative/public/uploads/` | Arquivos enviados pelo painel |
 | Backups (`*.tar.gz`) | Contêm dados do conteúdo |
@@ -432,7 +431,7 @@ Só devem aparecer arquivos de modelo (`.env.example`, `config.example.js`).
 
 ---
 
-## 9. Problemas comuns
+## 8. Problemas comuns
 
 ### Docker / Postgres
 
@@ -462,10 +461,9 @@ Só devem aparecer arquivos de modelo (`.env.example`, `config.example.js`).
 | Mensagem ou sintoma | Causa | Solução |
 |---|---|---|
 | Site mostra só o texto de reserva do HTML | O `cms.js` não conseguiu buscar o conteúdo | Aperte **F12 → Console** e veja a mensagem. Confira se o Strapi está rodando |
-| `403` (Forbidden) | Token errado, expirado ou não é Read-only | Gere um novo token (passo 4.8) e atualize o `config.js` |
-| `401` (Unauthorized) | Token ausente ou inválido | Confira se o `config.js` existe e se o `index.html` carrega `config.js` **antes** de `cms.js` |
+| `403` (Forbidden) | Token errado, expirado ou não é Read-only | Gere um novo token (passo 4.8) e atualize o `cms.js` |
+| `401` (Unauthorized) | Token ausente ou inválido | Confira se o `cms.js` existe e se o `index.html` carrega `cms.js` |
 | `404` (Not Found) | Conteúdo não publicado, ou endereço errado | Clique em **Publish** no Content Manager. Confira o endereço `/api/landing-page-2` |
-| Erro `STRAPI_TOKEN is not defined` | `config.js` não existe ou não foi carregado | Faça o passo 4.9 e confira a ordem dos scripts no `index.html` |
 | `Failed to fetch` ou erro de CORS | Strapi desligado, ou origem do site bloqueada | Confirme que <http://localhost:1337> abre. Se for CORS, veja a nota abaixo |
 | Editei no Strapi e o site não mudou | Faltou **Publish**, ou cache do navegador | Publique e atualize com **Ctrl + F5** |
 | O título troca, mas a lista não | O nome em `data-cms-list` difere do nome do campo no Strapi | Compare os dois nomes (devem ser idênticos) |
@@ -487,23 +485,22 @@ Só devem aparecer arquivos de modelo (`.env.example`, `config.example.js`).
 | Mensagem ou sintoma | Causa | Solução |
 |---|---|---|
 | `rejected ... fetch first` no `git push` | Há novidades no repositório remoto | Rode `git pull` e depois `git push` |
-| `.env` ou `config.js` aparece no `git status` | `.gitignore` não está funcionando | **Não commite.** Confira o `.gitignore` na raiz e peça ajuda |
+| `.env` aparece no `git status` | `.gitignore` não está funcionando | **Não commite.** Confira o `.gitignore` na raiz e peça ajuda |
 
 ---
 
-## 10. Segurança
+## 9. Segurança
 
 - As credenciais deste guia (`strapi` / `strapi`) são de **desenvolvimento local**. O banco só é acessível pelo seu computador.
-- O `site/config.js` **é lido pelo navegador**, então qualquer pessoa que abrir a página consegue ver o token no código. Para teste local isso é aceitável: o token é **Read-only** e aponta para `localhost`.
 - **Antes de publicar este site na internet**, resolva isso de uma destas formas:
   - liberar a leitura pública apenas do conteúdo da landing page (permissão `find` do papel *Public*, em Settings → Users & Permissions Plugin → Roles) e remover o token do site; ou
   - gerar o HTML já preenchido em uma etapa de build, sem o token no navegador.
 - Se um token ou o `.env` for commitado por engano, **apagar o arquivo não basta**, porque o valor continua no histórico do Git. Trate o segredo como vazado: regenere o token (Settings → API Tokens → Regenerate) e gere novas chaves para o `.env`.
-- Este repositório **não** deve conter: `.env`, `config.js` com token real, backups de dados, nem chaves de outros serviços.
+- Este repositório **não** deve conter: `.env`, `cms.js` com token real, backups de dados, nem chaves de outros serviços.
 
 ---
 
-## 11. Referência rápida
+## 10. Referência rápida
 
 ### Endereços e portas
 
